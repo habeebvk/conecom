@@ -1,4 +1,5 @@
 import 'package:ece/screens/add_form.dart';
+import 'package:ece/screens/authentication/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -35,11 +36,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: MediaQuery.of(context).size.height/14,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:  Colors.amber
+                    backgroundColor:  const Color.fromARGB(255, 251, 221, 172)
                   ),
                   onPressed: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => FormPage()));
-                  }, child: Text("Get Started",style: GoogleFonts.poppins(color: Colors.black,fontSize: 18),)),
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+                  }, child: Text("Get Started",style: GoogleFonts.poppins(color: Colors.black,fontSize: 20),)),
               ),
             )
           ],

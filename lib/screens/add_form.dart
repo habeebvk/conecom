@@ -1,11 +1,4 @@
-// Flutter FormPage widget
-// Save this as form_page.dart and import into your app.
-// Optional: to enable gallery/camera image picking, add to pubspec.yaml:
-//   image_picker: ^1.0.0   (use the latest version from pub.dev)
-// And add required permissions for Android/iOS as per image_picker docs.
-
 import 'dart:io';
-
 import 'package:ece/screens/cart_screen.dart';
 import 'package:ece/screens/list_screen.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +25,10 @@ class _FormPageState extends State<FormPage> {
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickImage() async {
-    final XFile? picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    final XFile? picked = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
     if (picked != null) {
       setState(() {
         _imageFile = File(picked.path);
@@ -51,13 +47,15 @@ class _FormPageState extends State<FormPage> {
         'imagePath': _imageFile?.path,
       };
 
-      // Replace this with your saving logic (API call / database save)
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Saved: ${data['item']} (price: ${data['price']})')),
+        SnackBar(content: Text('Saved: ${data['item']}')),
       );
-      // Optionally clear form
-      // _formKey.currentState?.reset();
-      // setState(() => _imageFile = null);
+
+      // Navigate to ListDisplay after saving
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ListDisplay()),
+      );
     }
   }
 
@@ -73,130 +71,203 @@ class _FormPageState extends State<FormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final Color primaryColor = const Color(0xFFB3E5FC); // Light Blue
+    final Color accentColor = const Color(0xFF81D4FA);
+    final Color backgroundColor = const Color(0xFFF5F9FC);
+
     return Scaffold(
-      appBar: AppBar(title: Text('Welcome Admin',style: GoogleFonts.poppins(fontWeight: FontWeight.w600),),
-      actions: [
-        IconButton(onPressed: (){
-          Navigator.push(context, MaterialPageRoute(builder: (context) => CartScreen()));
-        }, icon: Icon(Icons.shopping_cart_sharp))
-      ],
+      backgroundColor: backgroundColor,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        title: Padding(
+          padding: const EdgeInsets.only(left: 20),
+          child: Text(
+            'Welcome Admin',
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon:
+                const Icon(Icons.shopping_cart, color: Colors.black87),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const CartScreen()));
+            },
+          )
+        ],
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Container(
-            width: 720, // max width for larger screens; will shrink on phones
+            width: 720,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(24),
               boxShadow: [
-                BoxShadow(color: Colors.black12, blurRadius: 12, offset: Offset(0, 6)),
+                BoxShadow(
+                  color: Colors.black12.withOpacity(0.08),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                ),
               ],
             ),
             child: Form(
               key: _formKey,
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
+                    height: 70,
                     width: double.infinity,
-                    height: 60,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(topLeft: Radius.circular(20),topRight: Radius.circular(20)),
-                      color: Colors.amberAccent
+                      color: accentColor.withOpacity(0.6),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(24),
+                        topRight: Radius.circular(24),
+                      ),
                     ),
-                    child: Center(child: Text("Add Item",style: GoogleFonts.poppins(fontSize: 20,fontWeight: FontWeight.w400),))),
-                  SizedBox(height: 40,),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20,right: 20),
-                    child: TextFormField(
-                      controller: _itemController,
-                      textInputAction: TextInputAction.next,
-                      decoration: const InputDecoration(labelText: 'Item', border: OutlineInputBorder(gapPadding: 10,borderRadius: BorderRadius.all(Radius.circular(10)))),
-                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter item name' : null,
+                    child: Center(
+                      child: Text(
+                        "Item info",
+                        style: GoogleFonts.poppins(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
                     ),
                   ),
-                  SizedBox(height: 10,),
+                  const SizedBox(height: 30),
+
+                  // Item Name
+                  _buildTextField(_itemController, "Item Name",
+                      validator: (v) =>
+                          (v == null || v.isEmpty) ? "Enter item name" : null),
+                  const SizedBox(height: 15),
+
+                  // Price and Offer
                   Row(
                     children: [
                       Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 20,right: 5),
-                          child: TextFormField(
-                            controller: _priceController,
-                            keyboardType: TextInputType.numberWithOptions(decimal: true),
-                            textInputAction: TextInputAction.next,
-                            decoration: const InputDecoration(labelText: 'Price', border: OutlineInputBorder(gapPadding: 10,borderRadius: BorderRadius.all(Radius.circular(10)))),
-                            validator: (v) {
-                              if (v == null || v.trim().isEmpty) return 'Enter price';
-                              if (double.tryParse(v) == null) return 'Enter valid number';
-                              return null;
-                            },
-                          ),
+                        child: _buildTextField(
+                          _priceController,
+                          "Price",
+                          keyboardType:
+                              const TextInputType.numberWithOptions(decimal: true),
+                          validator: (v) {
+                            if (v == null || v.isEmpty) return "Enter price";
+                            if (double.tryParse(v) == null) return "Invalid number";
+                            return null;
+                          },
                         ),
                       ),
+                      const SizedBox(width: 10),
                       Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 5,right: 20),
-                          child: TextFormField(
-                            controller: _offerController,
-                            keyboardType: TextInputType.numberWithOptions(decimal: true),
-                            textInputAction: TextInputAction.next,
-                            decoration: const InputDecoration(labelText: 'Offer Amount', border: OutlineInputBorder(gapPadding: 10,borderRadius: BorderRadius.all(Radius.circular(10)))),
-                            validator: (v) {
-                              if (v != null && v.trim().isNotEmpty && double.tryParse(v) == null) return 'Enter valid number';
-                              return null;
-                            },
-                          ),
+                        child: _buildTextField(
+                          _offerController,
+                          "Offer",
+                          keyboardType:
+                              const TextInputType.numberWithOptions(decimal: true),
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 10,),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20,right: 20),
-                    child: TextFormField(
-                      controller: _stockController,
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.next,
-                      decoration: const InputDecoration(labelText: 'Stock', border: OutlineInputBorder(gapPadding: 10,borderRadius: BorderRadius.all(Radius.circular(10)))),
-                      validator: (v) {
-                        if (v == null || v.trim().isEmpty) return 'Enter stock count';
-                        if (int.tryParse(v) == null) return 'Enter valid integer';
-                        return null;
-                      },
-                    ),
+                  const SizedBox(height: 15),
+
+                  // Stock
+                  _buildTextField(
+                    _stockController,
+                    "Stock Quantity",
+                    keyboardType: TextInputType.number,
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return "Enter stock count";
+                      if (int.tryParse(v) == null) return "Invalid number";
+                      return null;
+                    },
                   ),
-                  SizedBox(height: 10,),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20,right: 20),
-                    child: TextFormField(
-                      controller: _descriptionController,
-                      keyboardType: TextInputType.multiline,
-                      maxLines: 4,
-                      textInputAction: TextInputAction.newline,
-                      decoration: const InputDecoration(labelText: 'Description', border: OutlineInputBorder(gapPadding: 10,borderRadius: BorderRadius.all(Radius.circular(10)))),
-                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter description' : null,
-                    ),
+                  const SizedBox(height: 15),
+
+                  // Description
+                  _buildTextField(
+                    _descriptionController,
+                    "Description",
+                    maxLines: 4,
+                    validator: (v) =>
+                        (v == null || v.isEmpty) ? "Enter description" : null,
                   ),
-                  SizedBox(height: 32,),
+                  const SizedBox(height: 15),
+
+                  // Image Upload Field (styled like textfield)
                   Padding(
-                    padding: const EdgeInsets.only(left: 20,right: 20,bottom: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadiusGeometry.circular(10)
-                            ),
-                            maximumSize: Size(400, 60)
-                          ),
-                          onPressed:  (){Navigator.push(context, MaterialPageRoute(builder: (context) => ListDisplay()));},
-                          child: Text('Save Item', style: GoogleFonts.poppins(fontSize: 16,color: Colors.white)),
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: GestureDetector(
+                      onTap: _pickImage,
+                      child: Container(
+                        height: 55,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          color: const Color(0xFFF8FAFB),
+                          border: Border.all(color: const Color(0xFFB0BEC5)),
                         ),
-                      ],
+                        child: Row(
+                          children: [
+                            SizedBox(width: 17,),
+                            Expanded(
+                              child: Text(
+                                _imageFile != null
+                                    ? "Image selected"
+                                    : "Upload Image",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 15,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                            ),
+                            if (_imageFile != null)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(right: 12),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.file(
+                                    _imageFile!,
+                                    width: 40,
+                                    height: 40,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  // Save Button
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 30),
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 251, 221, 172),
+                        foregroundColor: Colors.black87,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 40, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ListDisplay()));
+                      },
+                      label: Text("Submit",
+                          style: GoogleFonts.poppins(fontSize: 16)),
                     ),
                   ),
                 ],
@@ -204,6 +275,40 @@ class _FormPageState extends State<FormPage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  // Reusable text field
+  Widget _buildTextField(
+    TextEditingController controller,
+    String label, {
+    TextInputType? keyboardType,
+    int maxLines = 1,
+    String? Function(String?)? validator,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        maxLines: maxLines,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: GoogleFonts.poppins(color: Colors.grey[800]),
+          filled: true,
+          fillColor: const Color(0xFFF8FAFB),
+          border: OutlineInputBorder(
+            gapPadding: 5,
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFFB0BEC5)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFF81D4FA), width: 2),
+          ),
+        ),
+        validator: validator,
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:ece/screens/cart_screen.dart';
 import 'package:ece/screens/detail_screen.dart';
+import 'package:ece/screens/wishlist.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -20,6 +21,9 @@ class _ListDisplayState extends State<ListDisplay> {
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
         actions: [
+          IconButton(onPressed: (){
+          Navigator.push(context, MaterialPageRoute(builder: (context) => WishlistScreen()));
+          }, icon: Icon(Icons.favorite)),
           IconButton(onPressed: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) => CartScreen()));
           }, icon: const Icon(Icons.shopping_cart)),
@@ -60,8 +64,8 @@ class _ListDisplayState extends State<ListDisplay> {
                         borderRadius: BorderRadius.circular(8),
                         child: Image.asset(
                           'assets/home1.jpg',
-                          width: 100,
-                          height: 100,
+                          width: 80,
+                          height: 80,
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -81,17 +85,7 @@ class _ListDisplayState extends State<ListDisplay> {
                               ),
                             ),
                             const SizedBox(height: 6),
-                            Text(
-                              "Built with perfectly safe and durable premium glass with high quality",
-                              style: GoogleFonts.poppins(
-                                fontSize: 13,
-                                color: Colors.grey[700],
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
+                            Column(
                               children: [
                                 Text(
                                   "Rs.100",
