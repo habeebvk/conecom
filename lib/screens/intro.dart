@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Text("The golden hour, that fleeting period of time just after sunrise or before sunset, casts a magical and transformative glow upon the world. During these moments, the sun hangs low in the sky, its light diffused and warm, painting everything in shades of amber, gold, and soft orange. It's a time when ordinary landscapes become extraordinary, shadows stretch into long, dramatic shapes, and even the most mundane objects are imbued with a sense of wonder and tranquility. Photographers and artists eagerly anticipate this brief window, knowing that it offers the perfect conditions to capture breathtaking images and create art that speaks to the heart.",style: GoogleFonts.poppins(color: Colors.white),),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 720,left: 30),
+              padding: const EdgeInsets.only(top: 810,left: 30),
               child: SizedBox(
                 width: MediaQuery.of(context).size.width/1.2,
                 height: MediaQuery.of(context).size.height/14,

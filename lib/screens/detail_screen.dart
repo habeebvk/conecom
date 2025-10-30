@@ -181,6 +181,15 @@ class _ItemDetailState extends State<ItemDetail> {
                 ),
               ],
             ),
+                        const SizedBox(height: 4),
+            Text(
+              "Out of Stock",
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
+              ),
+            ),
 
             const SizedBox(height: 24),
 
@@ -278,11 +287,23 @@ class _ItemDetailState extends State<ItemDetail> {
 
                       if (method == 'upi') {
                         var options = {
-                          'key': 'rzp_test_RZBBdT1yj6ZP2M',
-                          'amount': (widget.offerPrice * quantity * 100).toInt(), // in paise
-                          'name': widget.itemName,
-                          'description': 'Purchase',
-                          'timeout': 60,
+                              'key': 'rzp_test_RZBBdT1yj6ZP2M', // 🔑 Replace with your Razorpay Test key
+                              'amount': 50000, // in paise => ₹500
+                              'name': 'ECE Store',
+                              'description': 'Test Payment',
+                              'prefill': {
+                                'contact': '9876543210',
+                                'email': 'testuser@example.com',
+                              },
+                              'theme': {
+                                'color': '#3399cc',
+                              },
+                              'method': {
+                                'netbanking': true,
+                                'card': true, // ✅ Enable card payments
+                                'upi': true,
+                                'wallet': true,
+      }
                         };
                         _razorpay.open(options);
                       } else if (method == 'cod') {
@@ -314,6 +335,7 @@ class _ItemDetailState extends State<ItemDetail> {
   }
 
 }
+
 
 class PaymentBottomSheet extends StatelessWidget {
   const PaymentBottomSheet({super.key});
